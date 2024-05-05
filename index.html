@@ -1,16 +1,193 @@
 <!DOCTYPE html>
-<html lang='ru'>
-<head>
-    <meta charset='UTF-8'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>Магазин пончиков</title>
-</head>
-<style>
-/* Стили пиши здесь :) */
+<html>
 
-</style>
+<head>
+    <title>Квиз</title>
+    <style>
+        .true {
+            cursor: pointer;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+
+body{
+    text-align: center;
+    font-family: montserrat;
+}
+
+
+
+.choice {
+    display: flex;
+    justify-content: center;
+}
+
+.choice div{
+    border: 2px solid black;
+    padding: 15px;
+    margin: 13px;
+    border-radius: 4px;
+    margin-top: 150px;
+}
+
+
+
+.question{
+    font-size: 50px;
+
+}
+
+.answers{
+    display: flex;
+    justify-content: center;
+  
+
+
+}
+.answers div{
+    border: 2px solid black;
+    padding: 15px;
+    margin: 13px;
+    border-radius: 4px;
+
+}
+.answers div:hover{
+   background-color: gray;
+
+}
+    </style>
+</head>
+
 <body>
 
+    <div class="choice">
+        <div class="sum">Начать</div>
+    </div>
+
+    <div class="question">23 - 7</div>
+    <div class="answers">
+        <div>3</div>
+        <div class='true'>16</div>
+        <div>5</div>
+        <div>17</div>
+        <div>8</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+    <script type="text/javascript">
+        let question = document.querySelector('.question');
+        let answers = document.querySelectorAll('.answers div');
+        let btn = document.querySelector('.sum');
+
+        question.style.display = 'none';
+        for (let i = 0; i < answers.length; i++) answers[i].style.display = 'none';
+
+        function shuffle(array) {
+            let currentIndex = array.length,
+                randomIndex;
+
+            while (currentIndex != 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        btn.addEventListener('click', function () {
+            btn.style.display = 'none';
+            question.style.display = 'block';
+            for (let i = 0; i < answers.length; i++) answers[i].style.display = 'block';
+            updateQuestion();
+        });
+
+        function getRandomSign() {
+            let signArray = ['+', '-', '*', '/'];
+            return signArray[Math.floor(Math.random() * signArray.length)];
+        }
+
+        class Example {
+            constructor() {
+                let a = Math.round(Math.random() * 30);
+                let b = Math.round(Math.random() * 30);
+                this.question = `${a} ${getRandomSign()} ${b}`;
+                if (sign == '+') {
+                    this.true_answer = a + b;
+                } else if (sign == '-') {
+                    this.true_answer = a - b;
+                } else if (sign == '*') {
+                    this.true_answer = a * b;
+                } else {
+                    this.true_answer = a / b;
+                }
+                this.array_answer = shuffle([
+                    randint((a + b) - 15, (a + b) - 1),
+                    this.true_answer,
+                    randint((a + b) - 15, (a + b) - 1),
+                    randint((a + b) + 1, (a + b) + 15),
+                    randint((a + b) + 1, (a + b) + 15)
+                ]);
+            }
+
+            display() {
+                question.innerHTML = this.question;
+                for (let i = 0; i < this.array_answer.length; i++) {
+                    answers[i].innerHTML = this.array_answer[i];
+                }
+            }
+        }
+
+        function randint(min, max) {
+            return Math.round(Math.random() * (max - min) + min);
+        }
+
+        let counter = 0;
+        let current_answer;
+        let sign;
+
+        function updateQuestion() {
+            counter += 1;
+            sign = getRandomSign(); // Обновляем знак при каждом вызове функции
+            current_answer = new Example();
+            current_answer.display();
+        }
+
+        updateQuestion();
+
+        let trueCount = 0;
+
+        for (let i = 0; i < answers.length; i++) {
+            answers[i].addEventListener('click', function () {
+                if (answers[i].innerHTML == current_answer.true_answer) {
+                    answers[i].classList.add('true');
+                    anime({
+                        targets: '.true',
+                        backgroundColor: 'green',
+                        duration: 3000,
+                        easing: 'linear'
+                    });
+                    trueCount++;
+                } else {
+                    anime({
+                        targets: '.answers div',
+                        backgroundColor: 'red',
+                        duration: 3000,
+                        easing: 'linear'
+                    });
+                }
+                updateQuestion();
+            });
+        }
+
+        setTimeout(function () {
+            let allAnswers = Math.round(trueCount * 100 / counter);
+            document.querySelector('.question').innerHTML = `Вы дали ${trueCount} правильных ответов из ${counter}. Точность - ${allAnswers}%`;
+            for (let i = 0; i < answers.length; i++) answers[i].style.display = 'none';
+        }, 120000);
+    </script>
 </body>
+
 </html>
+
+
+
